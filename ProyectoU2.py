@@ -16,6 +16,12 @@ from dateutil.easter import easter
 from dateutil.relativedelta import relativedelta as rd, FR
 from holidays.constants import FEB,APR, MAR, JAN,JUL, MAY, AUG, OCT, NOV, DEC
 
+'''Libreria interfas'''
+from tkinter import *
+from tkinter import messagebox
+import tkinter as tk
+
+
 class HolidayEcuador(HolidayBase):    #
     """
    Clase para hacer mas sencillo los feriados.
@@ -247,7 +253,7 @@ class IEES:
     def afiliacionVoluntaria(self):
         Metodo que permite la afiliacion voluntaria de la persona.
     '''
-    def __init__(self, cedula,fechaNacimiento,tipoAfiliado):
+    def __init__(self, cedula,fechaNacimiento):
         '''Metodo Constructor: construye todos los atributos necesarios de la clase IEES
 
         Parametros:
@@ -261,16 +267,17 @@ class IEES:
         '''
         self.cedula=cedula
         self.fechaNacimiento=fechaNacimiento
-        self.tipoAfiliado=tipoAfiliado
+       
 
     def afiliacionVoluntaria(self):
         '''Metodo de afiliacion voluntaria 
-
+        
         Parametros:
         ------------
 
     
         '''
+        os.system("cls")
         print("mostrar registro afiliado: ")
 
 class afiliado(IEES):
@@ -319,3 +326,182 @@ class afiliado(IEES):
 
     def calculoPago(self):
         print("Valor calculado fianl: ")
+
+
+
+
+
+#Librería de mongo para poder trabajar con MongoDB
+import pymongo
+#Creación de una base de datos llamada dbProyecto2
+myClient = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = myClient ["dbProyecto2"]
+mycol = mydb ["Cedulas"]
+
+lista=[
+    {"_id": 1, "cedula": 1727249979, "nombres": "Nelson Jose Barahona Mantilla", "edad": 20, "nacionalidad": "Ecuatoriana", "genero": "Masculino", "Estado Civil": "Soltero" },
+    {"_id": 2, "cedula": 1784559964, "nombres": "Maria Skarley Damaris Sanchez", "edad": 45, "nacionalidad": "Ecuatoriana", "nacionalidad": "Femenino", "Estado Civil": "Casada" },
+    {"_id": 3, "cedula": 1804977502, "nombres": "Elian David Zambrano Karofilis", "edad": 16, "nacionalidad": "Ecuatoriana", "nacionalidad": "Masculino", "Estado Civil": "Soltero" },
+]
+
+
+
+'''
+MONGO host y Port en 27017, Estos valores son los predeterminados para todas las conexiones MongoDB locales.
+MONGO_TIEMPO_FUERA= time: sirve para detener el tipo de ejecución deseado
+'''
+MONGO_HOST="localhost"
+MONGO_PUERTO="27017"
+MONGO_TIEMPO_FUERA=1000
+
+
+'''MONGO_URI: se le utiliza para conectarse a la implementación de MongoDB: Independiente un conjunto de réplicas o un clúster(Agrupaciones) fragmentado.'''
+MONGO_URI="mongodb://"+MONGO_HOST+":"+MONGO_PUERTO+"/"
+
+
+'''Se llaman a la base de datos(dbProyecto2) y la colección(Cedulas)'''
+MONGO_BASEDATOS="dbProyecto2"
+MONGO_COLLECCION="Cedulas"
+
+
+'''Se instancia al cliente (usuario) para almacenar las bases de datos y colecciones necesarias'''
+cliente=pymongo.MongoClient(MONGO_URI,serverSelectionTimeoutMS=MONGO_TIEMPO_FUERA)
+baseDatos=cliente[MONGO_BASEDATOS]
+coleccion=baseDatos[MONGO_COLLECCION]
+
+
+'''Interfaz'''
+
+
+def validar():
+
+    if cedula.get()=="1727249979" and "1784559964" and "1804977502":
+
+        abrirVentana2()
+    else:
+        messagebox.showwarning("Error", "Cedula ingresada no registrada")
+
+
+def abrirVentana2():
+    interface.withdraw()
+    win=tk.Toplevel()
+    win.geometry('700x350')
+    win.configure(background='Light blue')
+    e3=tk.Label(win,text="Afiliacion Voluntaria",bg="blue",fg="black")
+    e3.pack(padx=5,pady=5,ipadx=5,ipady=5,fill=tk.X)
+    ingresoDatos=Frame(win, width=1200,height=600)
+    ingresoDatos.pack()
+    Label(ingresoDatos, text= "Ingrese ciudad").grid(row=1, column=0)
+    ciudad = Entry(ingresoDatos)
+    ciudad.focus()
+    ciudad.grid(row=1, column=1)
+    boton2=tk.Button(win,text='OK',command=win.destroy)
+    boton2.pack(side=tk.TOP)
+
+
+
+if __name__=="__main__":
+
+    '''Insertar lista a mongo db'''
+    #listaDatos=mycol.insert_many(lista)
+
+    '''Imprimir la insertacion de listas'''
+    #print(listaDatos.inserted_ids)
+
+ 
+
+    
+    interface=Tk()
+    interface.config(bg="white")
+    interface.geometry("700x350")
+    avisoIees=Label(interface, text= "Afiliacion: \n Registre la solicitud para afiliacion voluntaria de residentes en el Ecuador")
+    avisoIees.pack()
+    interfaceObjeto=Frame(interface,width="400",height="300")
+
+    interface.title("Afiliacion Voluntaria del IESS")
+   
+
+    # rellenar fill
+    # expand expandir
+    interfaceObjeto.pack()
+   #interface.iconbitmap(r'C:\Users\Equipo\Desktop\Python\IESS.ico')
+    interfaceObjeto.config(bg='Light blue')
+    interfaceObjeto.config(bd= 100)
+    
+    Label(interfaceObjeto, text='Ingrese su Numero de cedula: ').grid(row=1, column=0)
+
+    
+
+    #INGRESE cedula
+    cedula = Entry(interfaceObjeto)
+    cedula.focus()
+    cedula.grid(row=1, column=1)
+   
+
+    #INGRESAR Fecha de nacimiento
+    Label(interfaceObjeto, text='Ingrese su Fecha de Nacimiento: ').grid(row=2, column=0)
+    fechaNacimiento = Entry(interfaceObjeto)
+    fechaNacimiento.focus()
+    fechaNacimiento.grid(row=2, column=1)
+
+  
+
+    
+
+    Button(interface, text = "Ingresar", bg = "gold", fg = "black", command = validar, cursor = "circle", font = ("Arial",14)).pack(pady=20)
+
+    interface.mainloop()
+    
+
+
+
+    
+
+    '''Instanciar IEES '''
+    datoIESS=IEES(cedula,fechaNacimiento)
+
+
+    'Ingreso de datos del Afiliado Voluntario'
+
+    cedula=int(input("Ingrese su Numero de cedula: "))
+
+    fechaNacimiento=input("Ingrese su Fecha de Nacimiento: ") 
+    
+
+
+ 
+
+
+    
+    
+
+        
+
+       
+   
+    
+
+  
+    
+
+
+
+
+
+
+
+
+
+
+    
+ 
+
+
+
+
+
+
+
+
+
+
