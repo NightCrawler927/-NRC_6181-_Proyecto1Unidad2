@@ -9,6 +9,7 @@ from tkinter import ttk
 import requests
 import json
 
+import unittest
 
 import datetime
 
@@ -26,6 +27,10 @@ from tkinter import messagebox
 from tkinter import ttk
 import tkinter as tk
 from tkinter import font
+
+from matplotlib import pyplot 
+
+prov=0
 
 class FeriadoEcuador(HolidayBase):
     """
@@ -266,16 +271,16 @@ class IESS():
         self.fechaNacimiento=fechaNacimiento
         
     
-    def afiliacionVoluntaria(self):
-        
-    
-        self.ventana.config(bg="white")
-        self.ventana.geometry("700x350")
-        self.avisoIees=Label(self.ventana, text= "Afiliacion: \n Registre la solicitud para afiliacion voluntaria de residentes en el Ecuador")
+    def afiliacionVoluntaria(self,):
+        self.ventana.withdraw()
+        self.win1=tk.Toplevel()
+        self.win1.geometry('750x350')
+        self.win1.configure(background='Light blue')
+        self.avisoIees=Label(self.win1, text= "Afiliacion: \n Registre la solicitud para afiliacion voluntaria de residentes en el Ecuador")
         self.avisoIees.pack()
-        self.interfaceObjeto=Frame(self.ventana,width="400",height="300")
+        self.interfaceObjeto=Frame(self.win1,width="400",height="300")
 
-        self.ventana.title("Afiliacion Voluntaria del IESS")
+        self.win1.title("Afiliacion Voluntaria del IESS")
    
         # rellenar fill
         # expand expandir
@@ -298,7 +303,7 @@ class IESS():
         self.textFechaNacimiento.focus()
         self.textFechaNacimiento.grid(row=2, column=1)
 
-        Button(self.ventana, text = "Ingresar", bg = "gold", fg = "black", command = validar, cursor = "circle", font = ("Arial",14)).pack(pady=20)
+        Button(self.win1, text = "Ingresar", bg = "gold", fg = "black", command = logica.validar, cursor = "circle", font = ("Arial",14)).pack(pady=20)
     
     
 
@@ -443,10 +448,10 @@ class afiliado(IESS):
         Label(self.ingresoDatos, text= "Seleccione provincia").grid(row=1, column=0)
         self.provincia = StringVar()
         self.list_prov = ttk.Combobox(self.ingresoDatos, textvariable=self.provincia)
-        self.list_prov['values'] = queryProvincia()
+        self.list_prov['values'] = logica.queryProvincia()
         self.list_prov['state'] = 'readonly'
         self.list_prov.grid(row=1, column=1)
-        self.boton5=Button(self.win2,text='Generar Cantones',command=validarCan)
+        self.boton5=Button(self.win2,text='Generar Cantones',command=logica.validarCan)
         self.boton5.pack(side=tk.TOP)
         self.boton5.place(x=640, y=40)
 
@@ -530,7 +535,7 @@ class afiliado(IESS):
 
 
         '''Boton de tercera ventana'''
-        self.boton4=tk.Button(self.ventana3,text='Guardar',command=guardarDatosAfiliado)
+        self.boton4=tk.Button(self.ventana3,text='Guardar',command=logica.guardarDatosAfiliado)
         self.boton4.pack(side=tk.TOP)
 
 
@@ -572,135 +577,385 @@ coleccion=baseDatos[MONGO_COLLECCION]
 coleccion2=baseDatos[MONGO_COLLECCION2]
 coleccion3=baseDatos[MONGO_COLLECCION3]
 
-#Metodo para retonar lista de cedulas desde la coleccion Cedulas en MongoDB
-def queryCedulas():
-    coleccionTotal=coleccion.find()
-    coleccionCedulas=[]
+class LogicaNegocio():
 
-    for i in coleccionTotal:
-        coleccionCedulas.append(i['cedula'])
-    return coleccionCedulas
+    def __init__(self):
 
-#Metodo para retonar lista de provincias desde la coleccion Provincias en MongoDB
-def queryProvincia():
-    coleccionTotalProv=coleccion2.find()
-    coleccionProv=[]
+        self.coleccionCanton2=[]
+        self.coleccionProvincia=[]
+        self.coleccionParroquia=[]
+        self.coleccionDireccion=[]
+        self.coleccionFecha=[]
+        self.coleccionCorreo=[]
+        self.coleccionTelefono=[]
+        self.coleccionCelular=[]
+        self.coleccionSueldo=[]
+        self.coleccionCedulas2=[]
+        self.coleccionAporte=[]
 
-    for i in coleccionTotalProv:
-        coleccionProv.append(i['prov'])
-    return coleccionProv
+    def queryInformacion(self):
+        coleccionTotal=coleccion3.find()
 
-prov=0
-#Metodo para retonar las listas de cantones desde la coleccion Provincias en MongoDB
-def queryCanton():
-    global prov
-    coleccionTotalCanton=coleccion2.find()
-    coleccionCanton=[]
+        for i in coleccionTotal:
+            self.coleccionCedulas2.append(i['cedula'])
+        for i in coleccionTotal:
+            self.coleccionFecha.append(i['Fecha Nacimiento'])
+        for i in coleccionTotal:
+            self.coleccionProvincia.append(i['Provincia'])
+        for i in coleccionTotal:
+            self.coleccionCanton2.append(i['Canton'])
+        for i in coleccionTotal:
+            self.coleccionParroquia.append(i['Parroquia'])
+        for i in coleccionTotal:
+            self.coleccionDireccion.append(i['Direccion'])
+        for i in coleccionTotal:
+            self.coleccionCorreo.append(i['Correo'])
+        for i in coleccionTotal:
+            self.coleccionTelefono.append(i['Telefono'])
+        for i in coleccionTotal:
+            self.coleccionCelular.append(i['Celular'])
+        for i in coleccionTotal:
+            self.coleccionSueldo.append(i['Sueldo'])
+        for i in coleccionTotal:
+            self.coleccionAporte.append(i['Aporte de Afiliacion'])
+       
+    #Metodo para retonar lista de cedulas desde la coleccion Cedulas en MongoDB
+    def queryCedulas(self):
+        coleccionTotal=coleccion.find()
+        coleccionCedulas=[]
+
+        for i in coleccionTotal:
+            coleccionCedulas.append(i['cedula'])
+        return coleccionCedulas
+
+    #Metodo para retonar lista de provincias desde la coleccion Provincias en MongoDB
+    def queryProvincia(self):
+        coleccionTotalProv=coleccion2.find()
+        coleccionProv=[]
+
+        for i in coleccionTotalProv:
+            coleccionProv.append(i['prov'])
+        return coleccionProv
+
+
+    #Metodo para retonar las listas de cantones desde la coleccion Provincias en MongoDB
+    def queryCanton(self):
+        global prov
+        coleccionTotalCanton=coleccion2.find()
+        coleccionCanton=[]
     
-    for i in coleccionTotalCanton:
-        coleccionCanton.append(i['cantones'])
-    return coleccionCanton
+        for i in coleccionTotalCanton:
+            coleccionCanton.append(i['cantones'])
+        return coleccionCanton
     
 
-#Metodo para retonar lista de edades desde la coleccion cedulas en MongoDB
-def queryEdad():
-    myquery = {"edad": {"$gt": 18}}    
-    coleccionTotalEdades=coleccion.find(myquery)
-    coleccionEdad=[]
+    #Metodo para retonar lista de edades desde la coleccion cedulas en MongoDB
+    def queryEdad(self):
+        myquery = {"edad": {"$gt": 18}}    
+        coleccionTotalEdades=coleccion.find(myquery)
+        coleccionEdad=[]
 
-    for i in coleccionTotalEdades:
-        coleccionEdad.append(i['cedula'])
-    return coleccionEdad
+        for i in coleccionTotalEdades:
+            coleccionEdad.append(i['cedula'])
+        return coleccionEdad
 
-#Metodo para validar cedula y edad 
-def validar():
-    cedulasTotal=queryCedulas()
-    cedulaEdadTotal=queryEdad()
-    
-    if datoIESS.textCedula.get() in cedulasTotal:
-        if datoIESS.textCedula.get() in cedulaEdadTotal:
-            afili.Principal()
+    def validarInf(self,cedula,fechaNacimiento,sueldo,provincia,canton,parroquia,direccion,correo,telefono,celular,aporte):
+
+        if cedula in self.coleccionCedulas2:
+            return True
+        elif fechaNacimiento in self.coleccionFecha:
+            return True
+        elif sueldo in self.coleccionSueldo:
+            return True
+        elif provincia in self.coleccionProvincia:
+            return True
+        elif canton in self.coleccionCanton2:
+            return True
+        elif parroquia in self.coleccionParroquia:
+            return True
+        elif direccion in self.coleccionDireccion:
+            return True
+        elif correo in self.coleccionCorreo:
+            return True
+        elif telefono in self.coleccionTelefono:
+            return True
+        elif celular in self.coleccionCelular:
+            return True
+        elif aporte in self.coleccionAporte:
+            return True
+
+        return False
             
+
+    #Metodo para validar cedula y edad 
+    def validar(self,cedula):
+        
+        cedulasTotal=self.queryCedulas()
+        cedulaEdadTotal=self.queryEdad()
+
+        if cedula in cedulasTotal:
+            if cedula in cedulaEdadTotal:
+                return True
+            else:
+                messagebox.showwarning("Error", "Cedula ingresada no es mayor de edad")
         else:
-            messagebox.showwarning("Error", "Cedula ingresada no es mayor de edad")
-    else:
-        messagebox.showwarning("Error", "Cedula ingresada no registrada")
+            messagebox.showwarning("Error", "Cedula ingresada no registrada")
+        return False
+    '''
+        if datoIESS.textCedula.get() in cedulasTotal:
+            if datoIESS.textCedula.get() in cedulaEdadTotal:
+                afili.Principal()
+                return True
+            else:
+                messagebox.showwarning("Error", "Cedula ingresada no es mayor de edad")
+        else:
+            messagebox.showwarning("Error", "Cedula ingresada no registrada")
+        return False
+    '''
         
 
-#Metodo para validar provincia ,canton, y correo
-def validarCan():
-    provinciasTotal=queryProvincia()
-    cantonesTotal=queryCanton()
-    print(cantonesTotal)
-    if afili.provincia.get() == provinciasTotal[0]:
-        canton_list=cantonesTotal[0]
-    elif afili.provincia.get() ==provinciasTotal[1]:
-        canton_list=cantonesTotal[1]
-    elif afili.provincia.get() ==provinciasTotal[2]:
-        canton_list=cantonesTotal[2]
-    elif afili.provincia.get() ==provinciasTotal[3]:
-        canton_list=cantonesTotal[3]
-    elif afili.provincia.get() ==provinciasTotal[4]:
-        canton_list=cantonesTotal[4]
-    elif afili.provincia.get() ==provinciasTotal[5]:
-        canton_list=cantonesTotal[5]
-    elif afili.provincia.get() ==provinciasTotal[6]:
-        canton_list=cantonesTotal[6]
-    elif afili.provincia.get() ==provinciasTotal[7]:
-        canton_list=cantonesTotal[7]
-    elif afili.provincia.get() ==provinciasTotal[8]:
-        canton_list=cantonesTotal[8]
-    elif afili.provincia.get() ==provinciasTotal[9]:
-        canton_list=cantonesTotal[9]
-    elif afili.provincia.get() ==provinciasTotal[10]:
-        canton_list=cantonesTotal[10]
-    elif afili.provincia.get() ==provinciasTotal[11]:
-        canton_list=cantonesTotal[11]
-    elif afili.provincia.get() ==provinciasTotal[12]:
-        canton_list=cantonesTotal[12]
-    elif afili.provincia.get() ==provinciasTotal[13]:
-        canton_list=cantonesTotal[13]
-    elif afili.provincia.get() ==provinciasTotal[14]:
-        canton_list=cantonesTotal[14]
-    elif afili.provincia.get() ==provinciasTotal[15]:
-        canton_list=cantonesTotal[15]
-    elif afili.provincia.get() ==provinciasTotal[16]:
-        canton_list=cantonesTotal[16]
-    elif afili.provincia.get() ==provinciasTotal[17]:
-        canton_list=cantonesTotal[17]
-    elif afili.provincia.get() ==provinciasTotal[18]:
-        canton_list=cantonesTotal[18]
-    elif afili.provincia.get() ==provinciasTotal[19]:
-        canton_list=cantonesTotal[19]
-    elif afili.provincia.get() ==provinciasTotal[20]:
-        canton_list=cantonesTotal[20]
-    elif afili.provincia.get() ==provinciasTotal[21]:
-        canton_list=cantonesTotal[21]
-    elif afili.provincia.get() ==provinciasTotal[22]:
-        canton_list=cantonesTotal[22]
-    elif afili.provincia.get() ==provinciasTotal[23]:
-        canton_list=cantonesTotal[23]
+    #Metodo para validar provincia ,canton, y correo
+    def validarCan(self):
+        provinciasTotal=self.queryProvincia()
+        cantonesTotal=self.queryCanton()
+        print(cantonesTotal)
+        if afili.provincia.get() == provinciasTotal[0]:
+            canton_list=cantonesTotal[0]
+        elif afili.provincia.get() ==provinciasTotal[1]:
+            canton_list=cantonesTotal[1]
+        elif afili.provincia.get() ==provinciasTotal[2]:
+            canton_list=cantonesTotal[2]
+        elif afili.provincia.get() ==provinciasTotal[3]:
+            canton_list=cantonesTotal[3]
+        elif afili.provincia.get() ==provinciasTotal[4]:
+            canton_list=cantonesTotal[4]
+        elif afili.provincia.get() ==provinciasTotal[5]:
+            canton_list=cantonesTotal[5]
+        elif afili.provincia.get() ==provinciasTotal[6]:
+            canton_list=cantonesTotal[6]
+        elif afili.provincia.get() ==provinciasTotal[7]:
+            canton_list=cantonesTotal[7]
+        elif afili.provincia.get() ==provinciasTotal[8]:
+            canton_list=cantonesTotal[8]
+        elif afili.provincia.get() ==provinciasTotal[9]:
+            canton_list=cantonesTotal[9]
+        elif afili.provincia.get() ==provinciasTotal[10]:
+            canton_list=cantonesTotal[10]
+        elif afili.provincia.get() ==provinciasTotal[11]:
+            canton_list=cantonesTotal[11]
+        elif afili.provincia.get() ==provinciasTotal[12]:
+            canton_list=cantonesTotal[12]
+        elif afili.provincia.get() ==provinciasTotal[13]:
+            canton_list=cantonesTotal[13]
+        elif afili.provincia.get() ==provinciasTotal[14]:
+            canton_list=cantonesTotal[14]
+        elif afili.provincia.get() ==provinciasTotal[15]:
+            canton_list=cantonesTotal[15]
+        elif afili.provincia.get() ==provinciasTotal[16]:
+            canton_list=cantonesTotal[16]
+        elif afili.provincia.get() ==provinciasTotal[17]:
+            canton_list=cantonesTotal[17]
+        elif afili.provincia.get() ==provinciasTotal[18]:
+            canton_list=cantonesTotal[18]
+        elif afili.provincia.get() ==provinciasTotal[19]:
+            canton_list=cantonesTotal[19]
+        elif afili.provincia.get() ==provinciasTotal[20]:
+            canton_list=cantonesTotal[20]
+        elif afili.provincia.get() ==provinciasTotal[21]:
+            canton_list=cantonesTotal[21]
+        elif afili.provincia.get() ==provinciasTotal[22]:
+            canton_list=cantonesTotal[22]
+        elif afili.provincia.get() ==provinciasTotal[23]:
+            canton_list=cantonesTotal[23]
 
-    Label(afili.ingresoDatos, text= "Seleccione Canton").grid(row=2, column=0)
-    afili.canton = StringVar()
-    list_canton = ttk.Combobox(afili.ingresoDatos, textvariable=afili.canton)
-    list_canton['values'] = canton_list
-    list_canton['state'] = 'readonly'
-    list_canton.grid(row=2, column=1)
+        Label(afili.ingresoDatos, text= "Seleccione Canton").grid(row=2, column=0)
+        afili.canton = StringVar()
+        list_canton = ttk.Combobox(afili.ingresoDatos, textvariable=afili.canton)
+        list_canton['values'] = canton_list
+        list_canton['state'] = 'readonly'
+        list_canton.grid(row=2, column=1)
     
 
 
 
-#Metodo para guardar afiliados ingresados
-def guardarDatosAfiliado ():
+    #Metodo para guardar afiliados ingresados
+    def guardarDatosAfiliado (self):
         '''Creación de un diccionario con los datos ingresados'''
         datosAfiliado={'cedula': datoIESS.textCedula.get(), 'Fecha Nacimiento': datoIESS.textFechaNacimiento.get(), 'Provincia': afili.provincia.get(), 'Canton': afili.canton.get(), 'Parroquia': afili.textParroquia.get(), 'Direccion': afili.textDireccion.get(), 'Correo': afili.textCorreo.get(), 'Telefono': afili.textTelefono.get(), 'Celular': afili.textCelular.get(), 'Sueldo': afili.textSuedo.get(), 'Aporte de Afiliacion': str(afili.porcentajeTotal)}
         '''Agregamos nuetro diccionario a nuestra base de datos'''
         insertarDatosAfiliado=coleccion3.insert_one(datosAfiliado)
 
 
+class Menu:
+
+    def __init__(self,LoginMenu):
+        self.LoginMenu=LoginMenu
+
+    def administradorMetodo(self):
+        afili.Principal()
+
+    def callCenterMetodo(self):
+        pass
+
+    def SecretariaMetodo(self):
+        self.grafica()
+
+    def afiliarceMetodo(self):
+        datoIESS.afiliacionVoluntaria()
+    
+    def Principal1(self):
+
+        """Se crea una raiz o root de la interfaz"""
+        """Nombre de la ventana"""
+        self.LoginMenu.title("Menu de Valcon Servicio IESS")
+        """Dimensiones de la ventana"""
+        self.LoginMenu.geometry("600x400+250+100")
+        """width="False", height="False, se usa para que el cliente no pueda mover el tamaño del de la ventana"""
+        self.LoginMenu.resizable(width="False", height="False")
+    
+        mensaje = Label(self.LoginMenu, text = "Valcon Servicio IESS", font=font.Font(family="Arial", size = "13"))
+        mensaje.pack()
+    
+        administrador=Button(self.LoginMenu,text="Administrador" ,bg= "gold", font=font.Font(family="anonymous pro font", size = "13"),command= self.administradorMetodo)
+        administrador.pack()
+    
+        callCenter = Button(self.LoginMenu,text="Call center",bg= "gold", font=font.Font(family="anonymous pro font", size = "13"),command=self.callCenterMetodo)
+        callCenter.pack()
+
+        secretario =  Button(self.LoginMenu,text="Secretaria",bg= "gold", font=font.Font(family="anonymous pro font", size = "13"),command=self.SecretariaMetodo)
+        secretario.pack()
+
+        afiliarce =  Button(self.LoginMenu,text="Afiliacion",bg= "gold", font=font.Font(family="anonymous pro font", size = "13"),command=self.afiliarceMetodo)
+        afiliarce.pack()
+    
+        Quitar=Button(self.LoginMenu,text="Salir",fg= "red", font=font.Font(family="Arial", size = "13"),command=self.LoginMenu.destroy)
+        Quitar.pack()
+
+    def grafica():
+
+        edades=("Mayores de 18 años","Menores de 18 años")
+        personas=(56,23)
+        colores=("red","yellow")
+
+        pyplot.pie(personas, colors=colores, labels=edades,autopct=("%1.f%%"))
+        pyplot.title("Edades de Ecuatorianos")
+        pyplot.show()
+
+
+class TestPython(unittest.TestCase):
+
+    def test_invalid_dato1(self):
+        """
+        Testea el ValueError de la cedula ingresada
+        """
+        cedula= "2334447920"
+        fechaNacimiento='2005-09-19'
+
+        with self.assertRaises(ValueError):
+            result = logica.validar(cedula)
+
+    
+    def test_invalid_dato2(self):
+        """
+        Testea el ValueError de la cedula ingresada
+        """
+        cedula = '1694566069'
+        fechaNacimiento = '13-16-2005'
+        with self.assertRaises(ValueError):
+            result = logica.validar(cedula)
+
+
+    def test_valid_dato3(self):
+        """
+        Testea el ValueError de la cedula ingresada
+        """
+        cedula = '2319521227'
+        fechaNacimiento = '30-09-1969'
+        with self.assertRaises(ValueError):
+            result = logica.validar(cedula)
+
+    
+    def test_valid_dato4(self):
+        """
+        Test that missing API key raises requests.HTTPError
+        """
+        cedula= "2477222964"
+        fechaNacimiento= "1982-09-15"
+        sueldo= 500.00
+        aporte= "128"
+        provincia= "Pichincha"
+        canton= "San Miguel de los Bancos"
+        parroquia= "Bella vista"
+        direccion= "Los Rios"
+        correo= "nelson@hotmail.com"
+        telefono= "2744537"
+        celular= "234234"
+        with self.assertRaises(ValueError):
+            result = logica.validarInf(cedula,fechaNacimiento,sueldo,provincia,canton,parroquia,direccion,correo,telefono,celular,aporte)
+
+
+    def test_valid_dato5(self):
+        """
+        Test that moved new holidays are restricted
+        """
+        cedula= "1727249979"
+        fechaNacimiento= "1982-09-15"
+        sueldo= 500.00
+        aporte= "228"
+        provincia= "Azuay"
+        canton= "Cuenca"
+        parroquia= "Bella vista"
+        direccion= "9 de diciembre"
+        correo= "nelson@hotmail.com"
+        telefono= "2283724243"
+        celular= "0912312098"
+        with self.assertRaises(ValueError):
+            result = logica.validarInf(cedula,fechaNacimiento,sueldo,provincia,canton,parroquia,direccion,correo,telefono,celular,aporte)
+
+
+    def test_valid_dato6(self):
+        """
+        Test that moved would-have-been holidays are not restricted
+        """
+        cedula= "2477222964"
+        fechaNacimiento= "1982-09-15"
+        sueldo= 300.00
+        aporte= "428"
+        provincia= "Pichincha"
+        canton= "San Miguel de los Bancos"
+        parroquia= "Bella vista"
+        direccion= "Los Rios"
+        correo= "nelson@hotmail.com"
+        telefono= "2744537"
+        celular= "234234"
+        with self.assertRaises(ValueError):
+            result = logica.validarInf(cedula,fechaNacimiento,sueldo,provincia,canton,parroquia,direccion,correo,telefono,celular,aporte)
+
+
+    def test_valid_dato7(self):
+        """
+        Test that moved would-have-been continuous holidays are not restricted
+        """
+        cedula= "2477222964"
+        fechaNacimiento= "1982-09-15"
+        sueldo=2500.00
+        aporte= "234"
+        provincia= "Pichincha"
+        canton= "San Miguel de los Bancos"
+        parroquia= "Bella vista"
+        direccion= "Los Rios"
+        correo= "nelson@hotmail.com"
+        telefono= "2744537"
+        celular= "234234"
+        with self.assertRaises(ValueError):
+            result = logica.validarInf(cedula,fechaNacimiento,sueldo,provincia,canton,parroquia,direccion,correo,telefono,celular,aporte)
+
+    
+
+
 
 if __name__=="__main__":
+
 
     '''Insertar lista cedulas a mongo db'''
     #listaDatos=mycol.insert_many(lista)
@@ -719,14 +974,16 @@ if __name__=="__main__":
     
     #Instanciar clase diasFeriado y pasar por parametros
     pyp = diasFeriado(fechaa,online=False)
-
+    logica=LogicaNegocio()
     if pyp.predict():
         messagebox.showwarning("Error", "No puede solicitar un servicio este día")
 
     else:
         '''Instanciar IEES y Afiliado '''
         interface=Tk()
+        Menuu=Menu(interface)
+        Menuu.Principal1()
         datoIESS=IESS(interface,cedula="",fechaNacimiento="")
+        unittest.main()
         afili=afiliado(interface,cedula="",fechaNacimiento="",sueldo=0.00,porcentaje=0.00,provincia="",canton="",parroquia="",direccion="",correo="",telefono="",celular="")
-        datoIESS.afiliacionVoluntaria()
         interface.mainloop()
